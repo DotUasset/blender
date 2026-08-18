@@ -761,6 +761,7 @@ set(GLSL_SRC
   shaders/material/gpu_shader_material_tex_voronoi.glsl
   shaders/material/gpu_shader_material_tex_wave.glsl
   shaders/material/gpu_shader_material_tex_white_noise.glsl
+  shaders/material/gpu_shader_material_tex_pcg_noise.glsl
   shaders/material/gpu_shader_material_toon.glsl
   shaders/material/gpu_shader_material_transform_utils.glsl
   shaders/material/gpu_shader_material_translucent.glsl
