@@ -96,6 +96,7 @@ void register_node_type_sh_tex_voronoi();
 void register_node_type_sh_tex_wave();
 void register_node_type_sh_tex_white_noise();
 void register_node_type_sh_tex_pcg_noise();
+void register_node_type_sh_tex_pcg_voronoi();
 void register_node_type_sh_uvalongstroke();
 void register_node_type_sh_uvmap();
 void register_node_type_sh_valtorgb();

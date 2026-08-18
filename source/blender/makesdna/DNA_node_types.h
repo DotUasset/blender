@@ -2711,6 +2711,13 @@ struct NodeTexVoronoi {
   char _pad[4] = {};
 };
 
+struct NodeTexPCGVoronoi {
+  DNA_DEFINE_CXX_METHODS(NodeTexPCGVoronoi)
+
+  int quality = 1;
+  char _pad[4] = {};
+};
+
 struct NodeTexMusgrave {
   DNA_DEFINE_CXX_METHODS(NodeTexMusgrave)
 
