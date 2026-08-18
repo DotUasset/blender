@@ -40,9 +40,9 @@ static int gpu_shader_tex_pcg_noise(GPUMaterial *mat,
  * (viewport Solid mode, field evaluation, etc). El GPU usa su propia copia en el .glsl. */
 static float3 pcg16_hash_to_float3(const float3 &vector)
 {
-  int px = int(math::floor(vector.x * 4096.0f));
-  int py = int(math::floor(vector.y * 4096.0f));
-  int pz = int(math::floor(vector.z * 4096.0f));
+  int px = int(math::floor(vector.x));
+  int py = int(math::floor(vector.y));
+  int pz = int(math::floor(vector.z));
 
   uint32_t x = uint32_t(px);
   uint32_t y = uint32_t(py);
@@ -63,7 +63,7 @@ static float3 pcg16_hash_to_float3(const float3 &vector)
   y >>= 16u;
   z >>= 16u;
 
-  return float3(float(x), float(y), float(z)) * (1.0f / 65536.0f);
+  return float3(float(x), float(y), float(z)) * (1.0f / 65535.0f);
 }
 
 class PCGNoiseFunction : public mf::MultiFunction {
