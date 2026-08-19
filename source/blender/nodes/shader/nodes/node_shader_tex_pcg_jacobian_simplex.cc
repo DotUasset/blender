@@ -71,8 +71,11 @@ static float3 pcg_mgradient_direction(uint32_t r)
 /* ---- Puerto de SimplexCorners (Random.ush) ---- */
 static void pcg_simplex_corners(const float3 &v, float3 corners[4])
 {
-  float3 tet = math::floor(v + float3(v.x / 3.0f, v.y / 3.0f, v.z / 3.0f));
-  float3 base = tet - float3(tet.x / 6.0f, tet.y / 6.0f, tet.z / 6.0f);
+  float skew = (v.x + v.y + v.z) / 3.0f;
+  float3 tet = math::floor(v + float3(skew, skew, skew));
+  
+  float unskew = (tet.x + tet.y + tet.z) / 6.0f;
+  float3 base = tet - float3(unskew, unskew, unskew);
   float3 f = v - base;
 
   float3 f_yzx = float3(f.y, f.z, f.x);
