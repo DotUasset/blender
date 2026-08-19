@@ -25,7 +25,8 @@ static void sh_node_tex_pcg_voronoi_declare(NodeDeclarationBuilder &b)
       .min(-10000.0f)
       .max(10000.0f)
       .default_input_type(NODE_DEFAULT_INPUT_POSITION_FIELD);
-  b.add_output<decl::Color>("Position"_ustr);
+  b.add_output<decl::Vector>("Position"_ustr).no_muted_links();
+  b.add_output<decl::Float>("Distance"_ustr).no_muted_links();
 }
 
 static void node_shader_buts_tex_pcg_voronoi(ui::Layout &layout,
@@ -177,7 +178,8 @@ class PCGVoronoiFunction : public mf::MultiFunction {
       mf::Signature sig;
       mf::SignatureBuilder builder{"PCGVoronoi", sig};
       builder.single_input<float3>("Vector");
-      builder.single_output<ColorGeometry4f>("Position");
+      builder.single_output<float3>("Position", mf::ParamFlag::SupportsUnusedOutput);
+      builder.single_output<float>("Distance", mf::ParamFlag::SupportsUnusedOutput);
       return sig;
     }();
     this->set_signature(&signature);
@@ -186,12 +188,23 @@ class PCGVoronoiFunction : public mf::MultiFunction {
   void call(const IndexMask &mask, mf::Params params, mf::Context /*context*/) const override
   {
     const VArray<float3> &vector = params.readonly_single_input<float3>(0, "Vector");
-    MutableSpan<ColorGeometry4f> r_position =
-        params.uninitialized_single_output<ColorGeometry4f>(1, "Position");
+    MutableSpan<float3> r_position =
+        params.uninitialized_single_output_if_required<float3>(1, "Position");
+    MutableSpan<float> r_distance =
+        params.uninitialized_single_output_if_required<float>(2, "Distance");
+
+    const bool calc_position = !r_position.is_empty();
+    const bool calc_distance = !r_distance.is_empty();
 
     mask.foreach_index([&](const int64_t i) {
       const float4 result = pcg_voronoi_noise_3d(vector[i], quality_);
-      r_position[i] = ColorGeometry4f(result.x, result.y, result.z, result.w);
+
+      if (calc_position) {
+        r_position[i] = float3(result.x, result.y, result.z);
+      }
+      if (calc_distance) {
+        r_distance[i] = result.w;
+      }
     });
   }
 

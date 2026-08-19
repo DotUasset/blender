@@ -47,7 +47,7 @@ float4 pcg_voronoi_compare(float4 minval, float3 candidate, float3 offset)
 }
 
 [[node]]
-void node_tex_pcg_voronoi(float3 vector, float quality, float4 &position)
+void node_tex_pcg_voronoi(float3 vector, float quality, float3 &outPosition, float &outDistance)
 {
   float3 fv = vector - floor(vector);
   float3 fv2 = (vector + 0.5f) - floor(vector + 0.5f);
@@ -102,5 +102,6 @@ void node_tex_pcg_voronoi(float3 vector, float quality, float4 &position)
     }
   }
 
-  position = float4(mindist.xyz, sqrt(mindist.w));
+  outPosition = mindist.xyz;
+  outDistance = sqrt(mindist.w);
 }
