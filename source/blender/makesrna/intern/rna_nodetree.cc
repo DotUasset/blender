@@ -5932,27 +5932,6 @@ static void def_sh_tex_magic(BlenderRNA *brna, StructRNA *srna)
   RNA_def_property_update(prop, 0, "rna_Node_update");
 }
 
-static void def_sh_tex_pcg_voronoi(BlenderRNA * /*brna*/, StructRNA *srna)
-{
-  static EnumPropertyItem prop_quality_items[] = {
-      {1, "QUALITY_1", 0, "1 (8 cells)", "Fastest search, matches UE Quality 1"},
-      {2, "QUALITY_2", 0, "2 (16 cells)", "Matches UE Quality 2"},
-      {3, "QUALITY_3", 0, "3 (27 cells)", "Matches UE Quality 3"},
-      {4, "QUALITY_4", 0, "4 (32 cells)", "Highest quality, matches UE Quality 4"},
-      {0, nullptr, 0, nullptr, nullptr}};
-
-  PropertyRNA *prop;
-
-  RNA_def_struct_sdna_from(srna, "NodeTexPCGVoronoi", "storage");
-
-  prop = RNA_def_property(srna, "quality", PROP_ENUM, PROP_NONE);
-  RNA_def_property_enum_sdna(prop, nullptr, "quality");
-  RNA_def_property_enum_items(prop, prop_quality_items);
-  RNA_def_property_ui_text(
-      prop, "Quality", "Search kernel size, matching Unreal Engine's Voronoi Quality parameter");
-  RNA_def_property_update(prop, NC_NODE | NA_EDITED, "rna_ShaderNode_socket_update");
-}
-
 static void def_sh_tex_voronoi(BlenderRNA *brna, StructRNA *srna)
 {
   static EnumPropertyItem prop_distance_items[] = {
@@ -10700,7 +10679,7 @@ static void rna_def_nodes(BlenderRNA *brna)
   define("ShaderNode", "ShaderNodeTexWave", def_sh_tex_wave);
   define("ShaderNode", "ShaderNodeTexWhiteNoise", def_sh_tex_white_noise);
   define("ShaderNode", "ShaderNodeTexPCGNoise");
-  define("ShaderNode", "ShaderNodeTexPCGVoronoi", def_sh_tex_pcg_voronoi);
+  define("ShaderNode", "ShaderNodeTexPCGVoronoi");
   define("ShaderNode", "ShaderNodeTexPCGJacobianSimplex");
   define("ShaderNode", "ShaderNodeUVAlongStroke", def_sh_uvalongstroke);
   define("ShaderNode", "ShaderNodeUVMap", def_sh_uvmap);

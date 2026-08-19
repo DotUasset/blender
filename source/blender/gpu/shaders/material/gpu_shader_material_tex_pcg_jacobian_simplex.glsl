@@ -59,7 +59,7 @@ void pcg_simplex_corners(float3 v, out float3 T0, out float3 T1, out float3 T2, 
 void node_tex_pcg_jacobian_simplex(float3 vector,
                                    float4 &outNoise,
                                    float4 &outGradient,
-                                   float4 &outCurl)
+                                   float4 &outCurl,
 								   float &outDistance)
 {
   float3 T[4];
