@@ -763,6 +763,7 @@ set(GLSL_SRC
   shaders/material/gpu_shader_material_tex_white_noise.glsl
   shaders/material/gpu_shader_material_tex_pcg_noise.glsl
   shaders/material/gpu_shader_material_tex_pcg_voronoi.glsl
+  shaders/material/gpu_shader_material_tex_pcg_jacobian_simplex.glsl
   shaders/material/gpu_shader_material_toon.glsl
   shaders/material/gpu_shader_material_transform_utils.glsl
   shaders/material/gpu_shader_material_translucent.glsl

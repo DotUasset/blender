@@ -10701,6 +10701,7 @@ static void rna_def_nodes(BlenderRNA *brna)
   define("ShaderNode", "ShaderNodeTexWhiteNoise", def_sh_tex_white_noise);
   define("ShaderNode", "ShaderNodeTexPCGNoise");
   define("ShaderNode", "ShaderNodeTexPCGVoronoi", def_sh_tex_pcg_voronoi);
+  define("ShaderNode", "ShaderNodeTexPCGJacobianSimplex");
   define("ShaderNode", "ShaderNodeUVAlongStroke", def_sh_uvalongstroke);
   define("ShaderNode", "ShaderNodeUVMap", def_sh_uvmap);
   define("ShaderNode", "ShaderNodeValToRGB", def_colorramp);

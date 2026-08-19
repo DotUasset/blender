@@ -100,6 +100,7 @@ set(SRC
   nodes/node_shader_tex_white_noise.cc
   nodes/node_shader_tex_pcg_noise.cc
   nodes/node_shader_tex_pcg_voronoi.cc
+  nodes/node_shader_tex_pcg_jacobian_simplex.cc
   nodes/node_shader_uv_along_stroke.cc
   nodes/node_shader_uvmap.cc
   nodes/node_shader_value.cc

@@ -396,6 +396,7 @@ class NODE_MT_shader_node_texture_base(node_add_menu.NodeMenu):
         self.node_operator(layout, "ShaderNodeTexWhiteNoise")
         self.node_operator(layout, "ShaderNodeTexPCGNoise")
         self.node_operator(layout, "ShaderNodeTexPCGVoronoi")
+        self.node_operator(layout, "ShaderNodeTexPCGJacobianSimplex")
 
         self.draw_assets_for_catalog(layout, self.bl_label)
 
