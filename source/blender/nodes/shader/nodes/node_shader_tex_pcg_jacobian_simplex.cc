@@ -22,6 +22,7 @@ static void sh_node_tex_pcg_jacobian_simplex_declare(NodeDeclarationBuilder &b)
   b.add_output<decl::Color>("Noise"_ustr).no_muted_links();
   b.add_output<decl::Color>("Gradient"_ustr).no_muted_links();
   b.add_output<decl::Color>("Curl"_ustr).no_muted_links();
+  b.add_output<decl::Float>("Distance"_ustr).no_muted_links();
 }
 
 static int gpu_shader_tex_pcg_jacobian_simplex(GPUMaterial *mat,
@@ -171,6 +172,7 @@ class PCGJacobianSimplexFunction : public mf::MultiFunction {
       builder.single_output<ColorGeometry4f>("Noise", mf::ParamFlag::SupportsUnusedOutput);
       builder.single_output<ColorGeometry4f>("Gradient", mf::ParamFlag::SupportsUnusedOutput);
       builder.single_output<ColorGeometry4f>("Curl", mf::ParamFlag::SupportsUnusedOutput);
+	  builder.single_output<float>("Distance", mf::ParamFlag::SupportsUnusedOutput);
       return sig;
     }();
     this->set_signature(&signature);
@@ -185,10 +187,13 @@ class PCGJacobianSimplexFunction : public mf::MultiFunction {
         params.uninitialized_single_output_if_required<ColorGeometry4f>(2, "Gradient");
     MutableSpan<ColorGeometry4f> r_curl =
         params.uninitialized_single_output_if_required<ColorGeometry4f>(3, "Curl");
+	MutableSpan<float> r_distance =
+	    params.uninitialized_single_output_if_required<float>(4, "Distance");
 
     const bool calc_noise = !r_noise.is_empty();
     const bool calc_gradient = !r_gradient.is_empty();
     const bool calc_curl = !r_curl.is_empty();
+	const bool calc_distance = !r_distance.is_empty();
 
     mask.foreach_index([&](const int64_t i) {
       const JacobianResult j = pcg_jacobian_simplex(vector[i]);
@@ -197,7 +202,7 @@ class PCGJacobianSimplexFunction : public mf::MultiFunction {
         r_noise[i] = ColorGeometry4f(j.noise[0], j.noise[1], j.noise[2], 1.0f);
       }
       if (calc_gradient) {
-        r_gradient[i] = ColorGeometry4f(j.grad[0].x, j.grad[0].y, j.grad[0].z, j.noise[0]);
+        r_gradient[i] = ColorGeometry4f(j.grad[0].x, j.grad[0].y, j.grad[0].z, 1.0f);  // A=1.0 ahora
       }
       if (calc_curl) {
         const float cx = j.grad[2].y - j.grad[1].z;
@@ -205,6 +210,9 @@ class PCGJacobianSimplexFunction : public mf::MultiFunction {
         const float cz = j.grad[1].x - j.grad[0].y;
         r_curl[i] = ColorGeometry4f(cx, cy, cz, 1.0f);
       }
+	  if (calc_distance) {
+		r_distance[i] = j.noise[0];
+	  }
     });
   }
 

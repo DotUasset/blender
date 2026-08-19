@@ -60,6 +60,7 @@ void node_tex_pcg_jacobian_simplex(float3 vector,
                                    float4 &outNoise,
                                    float4 &outGradient,
                                    float4 &outCurl)
+								   float &outDistance)
 {
   float3 T[4];
   pcg_simplex_corners(vector, T[0], T[1], T[2], T[3]);
@@ -115,9 +116,10 @@ void node_tex_pcg_jacobian_simplex(float3 vector,
   }
 
   outNoise = float4(noiseOut[0], noiseOut[1], noiseOut[2], 1.0f);
-  outGradient = float4(gradOut[0], noiseOut[0]);
+  outGradient = float4(gradOut[0], 1.0f);
   outCurl = float4(gradOut[2].y - gradOut[1].z,
                    gradOut[0].z - gradOut[2].x,
                    gradOut[1].x - gradOut[0].y,
                    1.0f);
+  outDistance = noiseOut[0];
 }
