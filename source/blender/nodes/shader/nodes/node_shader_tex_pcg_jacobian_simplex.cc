@@ -21,8 +21,8 @@ static void sh_node_tex_pcg_jacobian_simplex_declare(NodeDeclarationBuilder &b)
       .default_input_type(NODE_DEFAULT_INPUT_POSITION_FIELD);
   b.add_output<decl::Color>("Noise"_ustr).no_muted_links();
   b.add_output<decl::Color>("Gradient"_ustr).no_muted_links();
-  b.add_output<decl::Color>("Curl"_ustr).no_muted_links();
   b.add_output<decl::Float>("Distance"_ustr).no_muted_links();
+  b.add_output<decl::Color>("Curl"_ustr).no_muted_links();   
 }
 
 static int gpu_shader_tex_pcg_jacobian_simplex(GPUMaterial *mat,
@@ -171,8 +171,8 @@ class PCGJacobianSimplexFunction : public mf::MultiFunction {
       builder.single_input<float3>("Vector");
       builder.single_output<ColorGeometry4f>("Noise", mf::ParamFlag::SupportsUnusedOutput);
       builder.single_output<ColorGeometry4f>("Gradient", mf::ParamFlag::SupportsUnusedOutput);
-      builder.single_output<ColorGeometry4f>("Curl", mf::ParamFlag::SupportsUnusedOutput);
-	  builder.single_output<float>("Distance", mf::ParamFlag::SupportsUnusedOutput);
+      builder.single_output<float>("Distance", mf::ParamFlag::SupportsUnusedOutput);
+	  builder.single_output<ColorGeometry4f>("Curl", mf::ParamFlag::SupportsUnusedOutput);
       return sig;
     }();
     this->set_signature(&signature);
@@ -185,15 +185,15 @@ class PCGJacobianSimplexFunction : public mf::MultiFunction {
         params.uninitialized_single_output_if_required<ColorGeometry4f>(1, "Noise");
     MutableSpan<ColorGeometry4f> r_gradient =
         params.uninitialized_single_output_if_required<ColorGeometry4f>(2, "Gradient");
-    MutableSpan<ColorGeometry4f> r_curl =
-        params.uninitialized_single_output_if_required<ColorGeometry4f>(3, "Curl");
-	MutableSpan<float> r_distance =
-	    params.uninitialized_single_output_if_required<float>(4, "Distance");
+    MutableSpan<float> r_distance =
+        params.uninitialized_single_output_if_required<float>(3, "Distance");
+	MutableSpan<ColorGeometry4f> r_curl =
+	    params.uninitialized_single_output_if_required<ColorGeometry4f>(4, "Curl");
 
     const bool calc_noise = !r_noise.is_empty();
     const bool calc_gradient = !r_gradient.is_empty();
-    const bool calc_curl = !r_curl.is_empty();
-	const bool calc_distance = !r_distance.is_empty();
+    const bool calc_distance = !r_distance.is_empty();
+	const bool calc_curl = !r_curl.is_empty();
 
     mask.foreach_index([&](const int64_t i) {
       const JacobianResult j = pcg_jacobian_simplex(vector[i]);
