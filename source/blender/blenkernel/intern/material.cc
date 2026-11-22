@@ -2232,10 +2232,10 @@ static void material_default_surface_init(Material **ma_p)
                      *output,
                      *bke::node_find_socket(*output, SOCK_IN, "Surface"_ustr));
 
-  principled->location[0] = -200.0f;
-  principled->location[1] = 100.0f;
-  output->location[0] = 200.0f;
-  output->location[1] = 100.0f;
+  principled->location[0] = -320.0f;
+  principled->location[1] = 0.0f;
+  output->location[0] = 0.0f;
+  output->location[1] = 0.0f;
 
   bke::node_set_active(*ntree, *output);
   BKE_ntree_update_without_main(*ntree);
@@ -2255,10 +2255,10 @@ static void material_default_volume_init(Material **ma_p)
                      *output,
                      *bke::node_find_socket(*output, SOCK_IN, "Volume"_ustr));
 
-  principled->location[0] = -200.0f;
-  principled->location[1] = 100.0f;
-  output->location[0] = 200.0f;
-  output->location[1] = 100.0f;
+  principled->location[0] = -320.0f;
+  principled->location[1] = 0.0f;
+  output->location[0] = 0.0f;
+  output->location[1] = 0.0f;
 
   bke::node_set_active(*ntree, *output);
   BKE_ntree_update_without_main(*ntree);
@@ -2278,10 +2278,10 @@ static void material_default_holdout_init(Material **ma_p)
                      *output,
                      *bke::node_find_socket(*output, SOCK_IN, "Surface"_ustr));
 
-  holdout->location[0] = 10.0f;
-  holdout->location[1] = 300.0f;
-  output->location[0] = 300.0f;
-  output->location[1] = 300.0f;
+  holdout->location[0] = -250.0f;
+  holdout->location[1] = 0.0f;
+  output->location[0] = 0.0f;
+  output->location[1] = 0.0f;
 
   bke::node_set_active(*ntree, *output);
   BKE_ntree_update_without_main(*ntree);
@@ -2314,12 +2314,12 @@ static void material_default_gsplat_init(Material **ma_p)
                      *output,
                      *bke::node_find_socket(*output, SOCK_IN, "Surface"_ustr));
 
-  attribute->location[0] = -300.0f;
-  attribute->location[1] = 100.0f;
-  emission->location[0] = -50.0f;
-  emission->location[1] = 100.0f;
-  output->location[0] = 200.0f;
-  output->location[1] = 100.0f;
+  attribute->location[0] = -350.0f;
+  attribute->location[1] = 0.0f;
+  emission->location[0] = -100.0f;
+  emission->location[1] = 0.0f;
+  output->location[0] = 0.0f;
+  output->location[1] = 0.0f;
 
   bke::node_set_active(*ntree, *output);
   BKE_ntree_update_without_main(*ntree);

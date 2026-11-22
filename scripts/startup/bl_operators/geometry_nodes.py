@@ -22,7 +22,7 @@ def add_empty_geometry_node_group(name, add_geometry_input=True):
     output_node = group.nodes.new('NodeGroupOutput')
     output_node.is_active_output = True
     output_node.select = False
-    output_node.location.x = 200
+    output_node.location.x = 0
 
     return group
 
@@ -155,7 +155,7 @@ def create_wrapper_group(operator, modifier, old_group):
 
     group_output_node = group.nodes.new('NodeGroupOutput')
     group_output_node.is_active_output = True
-    group_output_node.location.x = 200
+    group_output_node.location.x = 0
     group_output_node.select = False
 
     group_node = group.nodes.new("GeometryNodeGroup")
@@ -222,7 +222,7 @@ def create_wrapper_group(operator, modifier, old_group):
         for i, node in enumerate(store_nodes):
             node.location.x = (i + 1) * 175
             node.location.y = 0
-        group_output_node.location.x = (len(store_nodes) + 1) * 175
+        group_output_node.location.x = 0
 
         group.links.new(first_geometry_output, store_nodes[0].inputs["Geometry"])
         for i in range(len(store_nodes) - 1):

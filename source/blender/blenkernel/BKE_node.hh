@@ -248,6 +248,7 @@ struct NodeWidth {
   static constexpr int _200 = 200;
   static constexpr int _220 = 220;
   static constexpr int _240 = 240;
+  static constexpr int _300 = 300;
   static constexpr int _320 = 320;
 
   static constexpr int Default = 140;

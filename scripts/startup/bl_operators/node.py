@@ -749,7 +749,7 @@ class NODE_OT_add_empty_group(NodeAddOperator, bpy.types.Operator):
         output_node = group.nodes.new('NodeGroupOutput')
         output_node.is_active_output = True
         output_node.select = False
-        output_node.location.x = 200
+        output_node.location.x = 0
         return group
 
 
@@ -787,7 +787,7 @@ class NODE_OT_swap_empty_group(NodeSwapOperator, bpy.types.Operator):
         output_node = group.nodes.new('NodeGroupOutput')
         output_node.is_active_output = True
         output_node.select = False
-        output_node.location.x = 200
+        output_node.location.x = 0
         return group
 
 

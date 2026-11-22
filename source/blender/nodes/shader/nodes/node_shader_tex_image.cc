@@ -370,7 +370,7 @@ void register_node_type_sh_tex_image()
       ntype, "NodeTexImage", node_free_standard_storage, node_copy_standard_storage);
   ntype.gpu_fn = file_ns::node_shader_gpu_tex_image;
   ntype.labelfunc = node_image_label;
-  ntype.default_width = bke::NodeWidth::_240;
+  ntype.default_width = bke::NodeWidth::_300;
   ntype.materialx_fn = file_ns::node_shader_materialx;
 
   bke::node_register_type(ntype);

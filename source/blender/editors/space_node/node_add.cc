@@ -1857,7 +1857,7 @@ static void initialize_compositor_sequencer_node_group(const bContext *C,
       "Image", "", "NodeSocketColor", NODE_INTERFACE_SOCKET_OUTPUT, nullptr);
 
   bNode *output_node = bke::node_add_node(C, ntree, "NodeGroupOutput"_ustr);
-  output_node->location[0] = 200.0f;
+  output_node->location[0] = 0.0f;
   output_node->location[1] = 0.0f;
 
   bNode *input_node = bke::node_add_node(C, ntree, "NodeGroupInput"_ustr);
