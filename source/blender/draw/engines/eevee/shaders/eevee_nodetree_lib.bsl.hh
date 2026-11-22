@@ -1446,3 +1446,28 @@ void output_aov(KernelGlobals &kg,
   }
 #endif
 }
+
+/* Scene Color Node Implementation. */
+
+float3 node_scene_color_impl(KernelGlobals &kg,
+                             const ShadingData &sd,
+                             float2 uv,
+                             bool use_screen_uv)
+{
+  /* The previous layer radiance is only bound for forward shaded transparent surfaces
+   * (see `bind_previous_layer` in `eevee_pipeline.cc`). Everywhere else (deferred, shadow,
+   * volume, world...) the node evaluates to black. */
+  if (kg.pipe.use_forward_lighting && kg.pipe.use_transparency) [[static_branch]] {
+    [[resource_table]] eevee::PreviousLayerRadiance &prev_radiance = kg.previous_layer_radiance;
+
+    float2 tex_size = float2(textureSize(prev_radiance.previous_layer_radiance_tx, 0));
+    float2 sample_uv = use_screen_uv ? (sd.frag_co.xy / tex_size) : uv;
+
+    /* Avoid sampling outside of the buffer. */
+    float2 half_texel = 0.5f / tex_size;
+    sample_uv = clamp(sample_uv, half_texel, 1.0f - half_texel);
+
+    return textureLod(prev_radiance.previous_layer_radiance_tx, sample_uv, 0.0f).rgb;
+  }
+  return float3(0.0f);
+}

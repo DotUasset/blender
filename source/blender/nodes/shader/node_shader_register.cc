@@ -84,6 +84,7 @@ void register_shader_nodes()
   register_node_type_sh_radial_tiling();
   register_node_type_sh_raycast();
   register_node_type_sh_rgb();
+  register_node_type_sh_scene_color();
   register_node_type_sh_rgbtobw();
   register_node_type_sh_script();
   register_node_type_sh_sepcolor();

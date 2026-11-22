@@ -419,6 +419,16 @@ void node_shadow_raycast_impl(KernelGlobals & /*kg*/,
 {
 }
 
+/* Scene Color Node. */
+
+float3 node_scene_color_impl(KernelGlobals & /*kg*/,
+                             const ShadingData & /*sd*/,
+                             float2 /*uv*/,
+                             bool /*use_screen_uv*/)
+{
+  return float3(0.0f);
+}
+
 /* Light Accumulation Node. */
 
 void node_light_accumulation_impl(KernelGlobals & /*kg*/,

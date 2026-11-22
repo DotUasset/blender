@@ -88,6 +88,7 @@ set(SRC
   nodes/node_shader_sepcomb_color.cc
   nodes/node_shader_sepcomb_xyz.cc
   nodes/node_shader_shader_to_rgb.cc
+  nodes/node_shader_scene_color.cc
   nodes/node_shader_shadow_raycast.cc
   nodes/node_shader_squeeze.cc
   nodes/node_shader_subsurface_scattering.cc

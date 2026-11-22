@@ -83,6 +83,7 @@ class NODE_MT_shader_node_input_base(node_add_menu.NodeMenu):
             poll=object_material_shader_nodes_poll(context)
         )
         self.node_operator(layout, "ShaderNodeFresnel", poll=object_material_shader_nodes_poll(context))
+        self.node_operator(layout, "ShaderNodeSceneColor", poll=object_eevee_shader_nodes_poll(context))
         self.node_operator_with_outputs(
             context,
             layout,
