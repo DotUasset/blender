@@ -7,15 +7,16 @@
 #include "gpu_shader_common_color_utils.bsl.hh"
 
 [[node]]
-void separate_color_rgb(float4 col, float &r, float &g, float &b)
+void separate_color_rgb(float4 col, float &r, float &g, float &b, float &a)
 {
   r = col.r;
   g = col.g;
   b = col.b;
+  a = col.a;
 }
 
 [[node]]
-void separate_color_hsv(float4 col, float &r, float &g, float &b)
+void separate_color_hsv(float4 col, float &r, float &g, float &b, float &a)
 {
   float4 hsv;
 
@@ -23,10 +24,11 @@ void separate_color_hsv(float4 col, float &r, float &g, float &b)
   r = hsv[0];
   g = hsv[1];
   b = hsv[2];
+  a = col.a;
 }
 
 [[node]]
-void separate_color_hsl(float4 col, float &r, float &g, float &b)
+void separate_color_hsl(float4 col, float &r, float &g, float &b, float &a)
 {
   float4 hsl;
 
@@ -34,4 +36,5 @@ void separate_color_hsl(float4 col, float &r, float &g, float &b)
   r = hsl[0];
   g = hsl[1];
   b = hsl[2];
+  a = col.a;
 }

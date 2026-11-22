@@ -1326,6 +1326,8 @@ class CombineColorNode : public ShaderNode {
   NODE_SOCKET_API(float, r)
   NODE_SOCKET_API(float, g)
   NODE_SOCKET_API(float, b)
+  /* Accepted for compatibility with Blender's Combine Color node, but Cycles colors are RGB. */
+  NODE_SOCKET_API(float, alpha)
 };
 
 class CombineXYZNode : public ShaderNode {

@@ -9,7 +9,8 @@ shader node_separate_color(string color_type = "rgb",
                            color Color = 0.8,
                            output float Red = 0.0,
                            output float Green = 0.0,
-                           output float Blue = 0.0)
+                           output float Blue = 0.0,
+                           output float Alpha = 1.0)
 {
   color col;
   if (color_type == "rgb")
@@ -24,4 +25,6 @@ shader node_separate_color(string color_type = "rgb",
   Red = col[0];
   Green = col[1];
   Blue = col[2];
+  /* OSL colors have no alpha channel, so it is always opaque. */
+  Alpha = 1.0;
 }

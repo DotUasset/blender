@@ -58,6 +58,7 @@ static void sh_node_sepcolor_declare(NodeDeclarationBuilder &b)
         return CTX_IFACE_(BLT_I18NCONTEXT_COLOR, "Value");
     }
   });
+  b.add_output<decl::Float>("Alpha"_ustr);
 }
 
 static const char *gpu_shader_get_name(int mode)
@@ -93,7 +94,7 @@ NODE_SHADER_MATERIALX_BEGIN
 #ifdef WITH_MATERIALX
 {
   int mode = static_cast<NodeCombSepColor *>(node_->storage)->mode;
-  NodeItem color = get_input_value("Color", NodeItem::Type::Color3);
+  NodeItem color = get_input_value("Color", NodeItem::Type::Color4);
 
   NodeItem convert = empty();
   switch (mode) {
@@ -103,7 +104,7 @@ NODE_SHADER_MATERIALX_BEGIN
     case NODE_COMBSEP_COLOR_HSV:
     case NODE_COMBSEP_COLOR_HSL:
       /* NOTE: HSL is unsupported color model, using HSV instead */
-      convert = create_node("rgbtohsv", NodeItem::Type::Color3, {{"in", color}});
+      convert = create_node("rgbtohsv", NodeItem::Type::Color4, {{"in", color}});
       break;
     default:
       BLI_assert_unreachable();
@@ -111,7 +112,8 @@ NODE_SHADER_MATERIALX_BEGIN
 
   int index = STREQ(socket_out_->identifier, "Red")   ? 0 :
               STREQ(socket_out_->identifier, "Green") ? 1 :
-                                                        2;
+              STREQ(socket_out_->identifier, "Blue")  ? 2 :
+                                                        3;
   return convert[index];
 }
 #endif
@@ -194,6 +196,11 @@ static void sh_node_combcolor_declare(NodeDeclarationBuilder &b)
             return CTX_IFACE_(BLT_I18NCONTEXT_COLOR, "Value");
         }
       });
+  b.add_input<decl::Float>("Alpha"_ustr)
+      .default_value(1.0f)
+      .min(0.0f)
+      .max(1.0f)
+      .subtype(PROP_FACTOR);
   b.add_output<decl::Color>("Color"_ustr);
 }
 
@@ -233,11 +240,13 @@ NODE_SHADER_MATERIALX_BEGIN
   NodeItem red = get_input_value("Red", NodeItem::Type::Float);
   NodeItem green = get_input_value("Green", NodeItem::Type::Float);
   NodeItem blue = get_input_value("Blue", NodeItem::Type::Float);
+  NodeItem alpha = get_input_value("Alpha", NodeItem::Type::Float);
 
-  NodeItem combine = create_node("combine3", NodeItem::Type::Color3);
+  NodeItem combine = create_node("combine4", NodeItem::Type::Color4);
   combine.set_input("in1", red);
   combine.set_input("in2", green);
   combine.set_input("in3", blue);
+  combine.set_input("in4", alpha);
 
   NodeItem res = empty();
   switch (mode) {
@@ -247,7 +256,7 @@ NODE_SHADER_MATERIALX_BEGIN
     case NODE_COMBSEP_COLOR_HSV:
     case NODE_COMBSEP_COLOR_HSL:
       /* NOTE: HSL is unsupported color model, using HSV instead */
-      res = create_node("hsvtorgb", NodeItem::Type::Color3);
+      res = create_node("hsvtorgb", NodeItem::Type::Color4);
       res.set_input("in", combine);
       break;
     default:

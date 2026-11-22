@@ -43,6 +43,10 @@ ccl_device_noinline void svm_node_separate_color(
   if (stack_valid(node.blue_offset)) {
     stack_store_float(stack, node.blue_offset, color.z);
   }
+  if (stack_valid(node.alpha_offset)) {
+    /* Cycles colors are RGB only, so the alpha of a color is always opaque. */
+    stack_store_float(stack, node.alpha_offset, 1.0f);
+  }
 }
 
 CCL_NAMESPACE_END

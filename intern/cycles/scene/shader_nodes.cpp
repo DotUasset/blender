@@ -5867,6 +5867,7 @@ NODE_DEFINE(CombineColorNode)
   SOCKET_IN_FLOAT(r, "Red", 0.0f);
   SOCKET_IN_FLOAT(g, "Green", 0.0f);
   SOCKET_IN_FLOAT(b, "Blue", 0.0f);
+  SOCKET_IN_FLOAT(alpha, "Alpha", 1.0f);
 
   SOCKET_OUT_COLOR(color, "Color");
 
@@ -6065,6 +6066,7 @@ NODE_DEFINE(SeparateColorNode)
   SOCKET_OUT_FLOAT(r, "Red");
   SOCKET_OUT_FLOAT(g, "Green");
   SOCKET_OUT_FLOAT(b, "Blue");
+  SOCKET_OUT_FLOAT(alpha, "Alpha");
 
   return type;
 }
@@ -6082,6 +6084,11 @@ void SeparateColorNode::constant_fold(const ConstantFolder &folder)
         return;
       }
     }
+    /* Cycles colors have no alpha channel, so it is always opaque. */
+    if (outputs[3] == folder.output) {
+      folder.make_constant(1.0f);
+      return;
+    }
   }
 }
 
@@ -6095,6 +6102,7 @@ void SeparateColorNode::compile(SVMCompiler &compiler)
                         .red_offset = compiler.output("Red"),
                         .green_offset = compiler.output("Green"),
                         .blue_offset = compiler.output("Blue"),
+                        .alpha_offset = compiler.output("Alpha"),
                     });
 }
 

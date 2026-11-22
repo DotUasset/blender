@@ -8,8 +8,11 @@ shader node_combine_color(string color_type = "rgb",
                           float Red = 0.0,
                           float Green = 0.0,
                           float Blue = 0.0,
+                          float Alpha = 1.0,
                           output color Color = 0.8)
 {
+  /* Alpha is accepted for compatibility with Blender's Combine Color node, but OSL colors are
+   * RGB only so it is not part of the output. */
   if (color_type == "rgb" || color_type == "hsv" || color_type == "hsl")
     Color = color(color_type, Red, Green, Blue);
   else

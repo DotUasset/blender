@@ -405,7 +405,7 @@ struct SVMNodeSeparateColor {
   SVMStackOffset red_offset;
   SVMStackOffset green_offset;
   SVMStackOffset blue_offset;
-  uint8_t _pad[1];
+  SVMStackOffset alpha_offset;
 };
 static_assert(alignof(SVMNodeSeparateColor) <= alignof(uint));
 static_assert(sizeof(SVMNodeSeparateColor) % sizeof(uint) == 0);
