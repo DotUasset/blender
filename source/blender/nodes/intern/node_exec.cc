@@ -33,7 +33,8 @@ static int node_exec_socket_use_stack(bNodeSocket *sock)
               SOCK_VECTOR,
               SOCK_RGBA,
               SOCK_SHADER,
-              SOCK_ROTATION);
+              SOCK_ROTATION,
+              SOCK_IMAGE);
 }
 
 bNodeStack *node_get_socket_stack(bNodeStack *stack, bNodeSocket *sock)

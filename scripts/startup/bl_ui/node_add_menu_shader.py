@@ -99,6 +99,7 @@ class NODE_MT_shader_node_input_base(node_add_menu.NodeMenu):
                 "Random Per Island",
             ],
         )
+        self.node_operator(layout, "ShaderNodeInputImage", poll=object_eevee_shader_nodes_poll(context))
         self.node_operator(layout, "ShaderNodeLayerWeight", poll=object_material_shader_nodes_poll(context))
         self.node_operator_with_outputs(
             context,

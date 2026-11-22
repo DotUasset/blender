@@ -382,7 +382,7 @@ static void node_shader_buts_tex_image(ui::Layout &layout, bContext *C, PointerR
   PointerRNA iuserptr = RNA_pointer_get(ptr, "image_user");
 
   layout.context_ptr_set("image_user", &iuserptr);
-  template_id(&layout, C, ptr, "image", "IMAGE_OT_new", "IMAGE_OT_open", nullptr);
+  /* The image data-block selector is drawn by the "Image" input socket. */
   layout.prop(ptr, "interpolation", DEFAULT_FLAGS, "", ICON_NONE);
   layout.prop(ptr, "projection", DEFAULT_FLAGS, "", ICON_NONE);
 

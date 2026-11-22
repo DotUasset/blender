@@ -414,7 +414,14 @@ static void data_from_gpu_stack_list(ListBaseT<bNodeSocket> *sockets,
 {
   int i = 0;
   for (bNodeSocket &socket : *sockets) {
-    if (ELEM(socket.type, SOCK_FLOAT, SOCK_INT, SOCK_BOOLEAN, SOCK_VECTOR, SOCK_RGBA, SOCK_SHADER))
+    if (ELEM(socket.type,
+             SOCK_FLOAT,
+             SOCK_INT,
+             SOCK_BOOLEAN,
+             SOCK_VECTOR,
+             SOCK_RGBA,
+             SOCK_SHADER,
+             SOCK_IMAGE))
     {
       node_data_from_gpu_stack(ns[i], &gs[i]);
       i++;

@@ -17,6 +17,11 @@
 
 #include "DEG_depsgraph_query.hh"
 
+#include "UI_interface.hh"
+#include "UI_interface_layout.hh"
+
+#include "gpu_node_graph.hh"
+
 namespace blender {
 
 namespace nodes::node_shader_tex_image_cc {
@@ -24,6 +29,23 @@ namespace nodes::node_shader_tex_image_cc {
 static void sh_node_tex_image_declare(NodeDeclarationBuilder &b)
 {
   b.is_function_node();
+  b.add_input<decl::Image>("Image"_ustr)
+      .optional_label()
+      .custom_draw([](CustomSocketDrawParams &params) {
+        if (params.socket.is_logically_linked()) {
+          /* Linked: draw like any other socket (label only), hiding the data-block selector. */
+          params.draw_standard(params.layout);
+          return;
+        }
+        params.layout.alignment_set(ui::LayoutAlign::Expand);
+        ui::template_id(&params.layout,
+                        &params.C,
+                        &params.node_ptr,
+                        "image",
+                        "IMAGE_OT_new",
+                        "IMAGE_OT_open",
+                        nullptr);
+      });
   b.add_input<decl::Vector>("Vector"_ustr).default_input_type(NODE_DEFAULT_INPUT_POSITION_FIELD);
   b.add_output<decl::Color>("Color"_ustr).no_muted_links();
   b.add_output<decl::Float>("Alpha"_ustr).no_muted_links();
@@ -45,7 +67,9 @@ static int node_shader_gpu_tex_image(GPUMaterial *mat,
                                      GPUNodeStack *in,
                                      GPUNodeStack *out)
 {
-  Image *ima = id_cast<Image *>(node->id);
+  /* Get image from input socket (index 0) or fallback to node->id for backward compatibility. */
+  GPUNodeLink *image_link = in[0].link;
+
   NodeTexImage *tex = static_cast<NodeTexImage *>(node->storage);
 
   /* We get the image user from the original node, since GPU image keeps
@@ -54,17 +78,24 @@ static int node_shader_gpu_tex_image(GPUMaterial *mat,
   NodeTexImage *tex_original = static_cast<NodeTexImage *>(node_original->storage);
   ImageUser *iuser = &tex_original->iuser;
 
+  Image *ima = nullptr;
+
+  if (image_link) {
+    /* Get image from connected node (e.g., ShaderNodeInputImage). */
+    GPUMaterialTexture *src_texture = image_link->texture;
+    if (src_texture) {
+      ima = src_texture->ima;
+      iuser = &src_texture->iuser;
+    }
+  }
+
   if (!ima) {
-    return GPU_stack_link(mat, node, "node_tex_image_empty", in, out);
+    /* Fallback to node->id for backward compatibility. */
+    ima = id_cast<Image *>(node->id);
+    if (!ima) {
+      return GPU_stack_link(mat, node, "node_tex_image_empty", in, out);
+    }
   }
-
-  GPUNodeLink **texco = &in[0].link;
-  if (!*texco) {
-    *texco = GPU_attribute(mat, CD_AUTO_FROM_NAME, "");
-    node_shader_gpu_bump_tex_coord(mat, node, texco);
-  }
-
-  node_shader_gpu_tex_mapping(mat, node, in, out);
 
   GPUSamplerState sampler_state = GPUSamplerState::default_sampler();
 
@@ -99,22 +130,34 @@ static int node_shader_gpu_tex_image(GPUMaterial *mat,
   }
   const bool use_cubic = ELEM(tex->interpolation, SHD_INTERP_CUBIC, SHD_INTERP_SMART);
 
+  /* Create the GPU image link with the correct sampler state for non-UDIM cases. */
+  GPUNodeLink *gpu_image = GPU_image(mat, ima, iuser, sampler_state);
+
+  GPUNodeLink **texco = &in[1].link;
+  if (!*texco) {
+    *texco = GPU_attribute(mat, CD_AUTO_FROM_NAME, "");
+    node_shader_gpu_bump_tex_coord(mat, node, texco);
+  }
+
+  /* The Image socket is in[0] (GPU_NONE, so GPU_stack_link skips it); the vector is in[1]. */
+  node_shader_gpu_tex_mapping(mat, node, in + 1, out);
+
   /* Only use UDIM tiles if projection is flat.
    * Otherwise treat the first tile as a single image. (See #141776). */
   const bool use_udim = ima->source == IMA_SRC_TILED && tex->projection == SHD_PROJ_FLAT;
   if (use_udim) {
+    /* For UDIM, we need to create a tiled texture with the same sampler state. */
     const char *gpu_node_name = use_cubic ? "node_tex_tile_cubic" : "node_tex_tile_linear";
-    GPUNodeLink *gpu_image, *gpu_image_tile_mapping;
-    GPU_image_tiled(mat, ima, iuser, sampler_state, &gpu_image, &gpu_image_tile_mapping);
+    GPUNodeLink *gpu_image_tiled, *gpu_image_tile_mapping;
+    GPU_image_tiled(mat, ima, iuser, sampler_state, &gpu_image_tiled, &gpu_image_tile_mapping);
     /* UDIM tiles needs a `sampler2DArray` and `sampler1DArray` for tile mapping. */
-    GPU_stack_link(mat, node, gpu_node_name, in, out, gpu_image, gpu_image_tile_mapping);
+    GPU_stack_link(mat, node, gpu_node_name, in, out, gpu_image_tiled, gpu_image_tile_mapping);
   }
   else {
     const char *gpu_node_name = use_cubic ? "node_tex_image_cubic" : "node_tex_image_linear";
 
     switch (tex->projection) {
       case SHD_PROJ_FLAT: {
-        GPUNodeLink *gpu_image = GPU_image(mat, ima, iuser, sampler_state);
         GPU_stack_link(mat, node, gpu_node_name, in, out, gpu_image, GPU_kernel_globals());
         break;
       }
@@ -122,7 +165,6 @@ static int node_shader_gpu_tex_image(GPUMaterial *mat,
         gpu_node_name = use_cubic ? "tex_box_sample_cubic" : "tex_box_sample_linear";
         GPUNodeLink *vnor, *wnor, *col1, *col2, *col3;
         GPUNodeLink *blend = GPU_uniform(&tex->projection_blend);
-        GPUNodeLink *gpu_image = GPU_image(mat, ima, iuser, sampler_state);
         GPU_link(mat, "world_normals_get", GPU_shading_data(), &vnor);
         GPU_link(mat,
                  "normal_transform_world_to_object",
@@ -132,7 +174,7 @@ static int node_shader_gpu_tex_image(GPUMaterial *mat,
                  &wnor);
         GPU_link(mat,
                  gpu_node_name,
-                 in[0].link,
+                 *texco,
                  wnor,
                  gpu_image,
                  GPU_kernel_globals(),
@@ -145,8 +187,9 @@ static int node_shader_gpu_tex_image(GPUMaterial *mat,
       case SHD_PROJ_SPHERE: {
         /* This projection is known to have a derivative discontinuity.
          * Hide it by turning off mipmapping. */
-        sampler_state.disable_filtering_flag(GPU_SAMPLER_FILTERING_MIPMAP);
-        GPUNodeLink *gpu_image = GPU_image(mat, ima, iuser, sampler_state);
+        GPUSamplerState sphere_sampler_state = sampler_state;
+        sphere_sampler_state.disable_filtering_flag(GPU_SAMPLER_FILTERING_MIPMAP);
+        GPUNodeLink *gpu_image = GPU_image(mat, ima, iuser, sphere_sampler_state);
         GPU_link(mat, "point_texco_remap_square", *texco, texco);
         GPU_link(mat, "point_map_to_sphere", *texco, texco);
         GPU_stack_link(mat, node, gpu_node_name, in, out, gpu_image, GPU_kernel_globals());
@@ -155,8 +198,9 @@ static int node_shader_gpu_tex_image(GPUMaterial *mat,
       case SHD_PROJ_TUBE: {
         /* This projection is known to have a derivative discontinuity.
          * Hide it by turning off mipmapping. */
-        sampler_state.disable_filtering_flag(GPU_SAMPLER_FILTERING_MIPMAP);
-        GPUNodeLink *gpu_image = GPU_image(mat, ima, iuser, sampler_state);
+        GPUSamplerState tube_sampler_state = sampler_state;
+        tube_sampler_state.disable_filtering_flag(GPU_SAMPLER_FILTERING_MIPMAP);
+        GPUNodeLink *gpu_image = GPU_image(mat, ima, iuser, tube_sampler_state);
         GPU_link(mat, "point_texco_remap_square", *texco, texco);
         GPU_link(mat, "point_map_to_tube", *texco, texco);
         GPU_stack_link(mat, node, gpu_node_name, in, out, gpu_image, GPU_kernel_globals());
@@ -209,7 +253,19 @@ NODE_SHADER_MATERIALX_BEGIN
   if (!res.node) {
     res = val(MaterialX::Color4(1.0f, 0.0f, 1.0f, 1.0f));
 
-    Image *image = (Image *)node_->id;
+    /* Get image from input socket (index 0) or fallback to node->id for backward compatibility. */
+    Image *image = nullptr;
+    NodeItem image_input = get_input_link("Image", NodeItem::Type::Filename);
+    if (image_input) {
+      /* Image comes from connected node. For MaterialX, we need to get the image path. */
+      /* This would require more complex handling to get the actual image from the connected node. */
+      /* For now, fallback to node->id. */
+      image = (Image *)node_->id;
+    }
+    else {
+      image = (Image *)node_->id;
+    }
+
     if (image) {
       NodeTexImage *tex_image = static_cast<NodeTexImage *>(node_->storage);
 

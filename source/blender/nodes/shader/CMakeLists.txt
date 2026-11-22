@@ -10,6 +10,7 @@ set(INC
   PRIVATE ../../editors/include
   PRIVATE ../../makesrna
   PRIVATE ../../../../intern/sky/include
+  PRIVATE ../../../gpu/intern
   # RNA_prototypes.hh
   PRIVATE ${CMAKE_BINARY_DIR}/source/blender/makesrna
 )
@@ -54,6 +55,7 @@ set(SRC
   nodes/node_shader_holdout.cc
   nodes/node_shader_hueSatVal.cc
   nodes/node_shader_ies_light.cc
+  nodes/node_shader_input_image.cc
   nodes/node_shader_invert.cc
   nodes/node_shader_layer_weight.cc
   nodes/node_shader_light_accumulation.cc
@@ -182,6 +184,8 @@ endif()
 
 blender_add_lib(bf_nodes_shader "${SRC}" "${INC}" "${INC_SYS}" "${LIB}")
 add_library(bf::nodes::shader ALIAS bf_nodes_shader)
+
+target_include_directories(bf_nodes_shader PRIVATE "${CMAKE_SOURCE_DIR}/source/blender/gpu/intern")
 
 blender_set_target_unity_build(bf_nodes_shader 10)
 

@@ -1143,6 +1143,33 @@ static void def_sh_tex_image(BlenderRNA *brna, StructRNA *srna)
   RNA_def_property_update(prop, 0, "rna_Node_update");
 }
 
+static void def_sh_input_image(BlenderRNA *brna, StructRNA *srna)
+{
+  PropertyRNA *prop;
+
+  prop = RNA_def_property(srna, "image", PROP_POINTER, PROP_NONE);
+  RNA_def_property_pointer_sdna(prop, nullptr, "id");
+  RNA_def_property_struct_type(prop, "Image");
+  RNA_def_property_flag(prop, PROP_EDITABLE);
+  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
+  RNA_def_property_ui_text(prop, "Image", "");
+  RNA_def_property_update(prop, NC_NODE | NA_EDITED, "rna_Node_tex_image_update");
+  RNA_def_property_pointer_funcs(
+      prop, nullptr, nullptr, nullptr, "rna_Image_no_renderresult_or_viewer_poll");
+
+  RNA_def_struct_sdna_from(srna, "NodeTexImage", "storage");
+  def_sh_tex(brna, srna);
+
+  prop = RNA_def_property(srna, "image_user", PROP_POINTER, PROP_NONE);
+  RNA_def_property_flag(prop, PROP_NEVER_NULL);
+  RNA_def_property_pointer_sdna(prop, nullptr, "iuser");
+  RNA_def_property_ui_text(
+      prop,
+      "Image User",
+      "Parameters defining which layer, pass and frame of the image is displayed");
+  RNA_def_property_update(prop, 0, "rna_Node_update");
+}
+
 static void def_sh_tex_gradient(BlenderRNA *brna, StructRNA *srna)
 {
   static const EnumPropertyItem prop_gradient_type[] = {
@@ -2209,6 +2236,7 @@ void RNA_def_nodes_shader(BlenderRNA *brna)
   define("ShaderNode", "ShaderNodeHairInfo");
   define("ShaderNode", "ShaderNodeHoldout");
   define("ShaderNode", "ShaderNodeHueSaturation");
+  define("ShaderNode", "ShaderNodeInputImage", def_sh_input_image);
   define("ShaderNode", "ShaderNodeInvert");
   define("ShaderNode", "ShaderNodeLayerWeight");
   define("ShaderNode", "ShaderNodeLightAccumulation");
