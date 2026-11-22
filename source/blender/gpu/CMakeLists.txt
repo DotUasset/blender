@@ -709,6 +709,7 @@ set(GLSL_SRC
   shaders/material/gpu_shader_material_separate_xyz.bsl.hh
   shaders/material/gpu_shader_material_set.bsl.hh
   shaders/material/gpu_shader_material_scene_color.bsl.hh
+  shaders/material/gpu_shader_material_scene_depth.bsl.hh
   shaders/material/gpu_shader_material_shader_to_rgba.bsl.hh
   shaders/material/gpu_shader_material_shadow_raycast.bsl.hh
   shaders/material/gpu_shader_material_sheen.bsl.hh

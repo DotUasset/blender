@@ -131,6 +131,7 @@
 #include "gpu_shader_material_separate_xyz.bsl.hh"             /* IWYU pragma: export */
 #include "gpu_shader_material_set.bsl.hh"                      /* IWYU pragma: export */
 #include "gpu_shader_material_scene_color.bsl.hh"              /* IWYU pragma: export */
+#include "gpu_shader_material_scene_depth.bsl.hh"              /* IWYU pragma: export */
 #include "gpu_shader_material_shader_to_rgba.bsl.hh"           /* IWYU pragma: export */
 #include "gpu_shader_material_shadow_raycast.bsl.hh"           /* IWYU pragma: export */
 #include "gpu_shader_material_sheen.bsl.hh"                    /* IWYU pragma: export */

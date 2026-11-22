@@ -2270,6 +2270,7 @@ void RNA_def_nodes_shader(BlenderRNA *brna)
   define("ShaderNode", "ShaderNodeRGBToBW");
   define("ShaderNode", "ShaderNodeScript", def_sh_script);
   define("ShaderNode", "ShaderNodeSceneColor");
+  define("ShaderNode", "ShaderNodeSceneDepth");
   define("ShaderNode", "ShaderNodeSeparateColor", def_sh_combsep_color);
   define("ShaderNode", "ShaderNodeSeparateXYZ");
   define("ShaderNode", "ShaderNodeShaderToRGB");

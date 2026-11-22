@@ -429,6 +429,16 @@ float3 node_scene_color_impl(KernelGlobals & /*kg*/,
   return float3(0.0f);
 }
 
+/* Scene Depth Node. */
+
+float node_scene_depth_impl(KernelGlobals & /*kg*/,
+                            const ShadingData & /*sd*/,
+                            float2 /*uv*/,
+                            bool /*use_screen_uv*/)
+{
+  return 0.0f;
+}
+
 /* Light Accumulation Node. */
 
 void node_light_accumulation_impl(KernelGlobals & /*kg*/,

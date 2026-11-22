@@ -1471,3 +1471,31 @@ float3 node_scene_color_impl(KernelGlobals &kg,
   }
   return float3(0.0f);
 }
+
+/* Scene Depth Node Implementation. */
+
+float node_scene_depth_impl(KernelGlobals &kg,
+                            const ShadingData &sd,
+                            float2 uv,
+                            bool use_screen_uv)
+{
+  /* Same availability as the Scene Color node: forward shaded transparent surfaces only. */
+  if (kg.pipe.use_forward_lighting && kg.pipe.use_transparency) [[static_branch]] {
+    [[resource_table]] eevee::PreviousLayerHiZ &prev_hiz = kg.previous_layer_hiz;
+    [[resource_table]] eevee::PreviousLayerRadiance &prev_radiance = kg.previous_layer_radiance;
+
+    /* The HiZ buffer is padded. Use the radiance buffer (render extent) to map UVs to texels. */
+    int2 extent = textureSize(prev_radiance.previous_layer_radiance_tx, 0);
+    int2 texel = use_screen_uv ? int2(sd.frag_co.xy) : int2(uv * float2(extent));
+    texel = clamp(texel, int2(0), extent - 1);
+
+    float depth = texelFetch(prev_hiz.hiz_prev_tx, texel, 0).x;
+    /* Depth of 1.0 means nothing was rendered behind. */
+    if (depth >= 1.0f) {
+      return 0.0f;
+    }
+    /* Linear distance along the view axis, in scene units. */
+    return -kg.view.get(0).depth_screen_to_view(depth);
+  }
+  return 0.0f;
+}
