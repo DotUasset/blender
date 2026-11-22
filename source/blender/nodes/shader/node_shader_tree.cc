@@ -176,6 +176,7 @@ static bool shader_node_tree_socket_type_valid(bke::bNodeTreeType * /*ntreetype*
                                                                SOCK_BOOLEAN,
                                                                SOCK_VECTOR,
                                                                SOCK_RGBA,
+                                                               SOCK_IMAGE,
                                                                SOCK_SHADER,
                                                                SOCK_BUNDLE,
                                                                SOCK_CLOSURE,

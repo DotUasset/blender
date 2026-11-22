@@ -120,6 +120,7 @@ static bool composite_node_tree_socket_type_valid(bke::bNodeTreeType * /*ntreety
                                                                SOCK_VECTOR,
                                                                SOCK_INT_VECTOR,
                                                                SOCK_RGBA,
+                                                               SOCK_IMAGE,
                                                                SOCK_MATRIX,
                                                                SOCK_MENU,
                                                                SOCK_ROTATION,
