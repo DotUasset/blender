@@ -14,6 +14,8 @@
 #include "BKE_node_tree_zones.hh"
 #include "BKE_type_conversions.hh"
 
+#include "DNA_image_types.h"
+
 #include "BLI_listbase.hh"
 #include "BLI_math_vector_c.hh"
 #include "BLI_stack.hh"
@@ -2254,6 +2256,13 @@ class ShaderNodesInliner {
                               const SocketValue &value)
   {
     BLI_assert(dst_socket.is_input());
+    if (dst_socket.type == SOCK_IMAGE) {
+      /* Image sockets hold a data-block pointer, which is not a primitive value. Materialize it as
+       * an Image input node, so that the GPU node code can read it through the link. */
+      if (this->set_image_input_socket_value(dst_node, dst_socket, value)) {
+        return;
+      }
+    }
     if (dst_socket.flag & SOCK_HIDE_VALUE) {
       if (const auto *input_socket_value = std::get_if<InputSocketValue>(&value.value)) {
         if (input_socket_value->socket->flag & SOCK_HIDE_VALUE) {
@@ -2336,6 +2345,45 @@ class ShaderNodesInliner {
       return;
     }
     BLI_assert_unreachable();
+  }
+
+  /**
+   * Handles an input socket of type image whose value comes from an unlinked socket in the source
+   * tree (e.g. an unlinked image input of a group node that is forwarded by a group input node).
+   * Returns true if the value was handled.
+   */
+  bool set_image_input_socket_value(bNode &dst_node,
+                                    bNodeSocket &dst_socket,
+                                    const SocketValue &value)
+  {
+    const auto *input_socket_value = std::get_if<InputSocketValue>(&value.value);
+    if (!input_socket_value) {
+      return false;
+    }
+    const bNodeSocket &src_socket = *input_socket_value->socket;
+    if (src_socket.type != SOCK_IMAGE || !src_socket.default_value) {
+      return false;
+    }
+    Image *image = src_socket.default_value_typed<bNodeSocketValueImage>()->value;
+    if (!image) {
+      /* Leave the socket unset so that the node can still use its own data-block. */
+      return true;
+    }
+    bNode *image_node = this->add_node("ShaderNodeInputImage"_ustr);
+    if (!image_node) {
+      return true;
+    }
+    image_node->id = &image->id;
+    if (!(dst_tree_.id.tag & ID_TAG_NO_MAIN)) {
+      id_us_plus(&image->id);
+    }
+    bNodeSocket *image_out = image_node->outputs.first();
+    if (image_out && dst_tree_.typeinfo->validate_link(image_out->typeinfo->type,
+                                                       dst_socket.typeinfo->type))
+    {
+      bke::node_add_link(dst_tree_, *image_node, *image_out, dst_node, dst_socket);
+    }
+    return true;
   }
 
   NodeAndSocket try_primitive_value_to_output_socket(const PrimitiveSocketValue &value)
