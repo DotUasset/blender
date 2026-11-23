@@ -439,6 +439,13 @@ float node_scene_depth_impl(KernelGlobals & /*kg*/,
   return 0.0f;
 }
 
+/* Screen UV Node. */
+
+float3 node_screen_uv_impl(KernelGlobals & /*kg*/, const ShadingData & /*sd*/)
+{
+  return float3(0.0f);
+}
+
 /* Light Accumulation Node. */
 
 void node_light_accumulation_impl(KernelGlobals & /*kg*/,

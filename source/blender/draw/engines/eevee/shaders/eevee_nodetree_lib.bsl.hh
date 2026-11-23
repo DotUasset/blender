@@ -1472,6 +1472,22 @@ float3 node_scene_color_impl(KernelGlobals &kg,
   return float3(0.0f);
 }
 
+/* Screen UV Node Implementation.
+ *
+ * Returns the same UVs Scene Color uses when its Vector input is unconnected:
+ * (sd.frag_co.xy / previous layer radiance size, 0.0). No clamp here, Scene Color clamps. */
+
+float3 node_screen_uv_impl(KernelGlobals &kg, const ShadingData &sd)
+{
+  if (kg.pipe.use_forward_lighting && kg.pipe.use_transparency) [[static_branch]] {
+    [[resource_table]] eevee::PreviousLayerRadiance &prev_radiance = kg.previous_layer_radiance;
+
+    float2 tex_size = float2(textureSize(prev_radiance.previous_layer_radiance_tx, 0));
+    return float3(sd.frag_co.xy / tex_size, 0.0f);
+  }
+  return float3(0.0f);
+}
+
 /* Scene Depth Node Implementation. */
 
 float node_scene_depth_impl(KernelGlobals &kg,

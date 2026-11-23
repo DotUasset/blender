@@ -145,6 +145,7 @@
 #define SH_NODE_INPUT_IMAGE 727
 #define SH_NODE_SCENE_COLOR 728
 #define SH_NODE_SCENE_DEPTH 729
+#define SH_NODE_SCREEN_UV 730
 
 /** \} */
 

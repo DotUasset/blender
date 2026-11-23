@@ -85,6 +85,7 @@ void register_node_type_sh_raycast();
 void register_node_type_sh_rgb();
 void register_node_type_sh_scene_color();
 void register_node_type_sh_scene_depth();
+void register_node_type_sh_screen_uv();
 void register_node_type_sh_rgbtobw();
 void register_node_type_sh_script();
 void register_node_type_sh_sepcolor();
